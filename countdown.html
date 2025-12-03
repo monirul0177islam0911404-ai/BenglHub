@@ -1,0 +1,61 @@
+<!-- countdown.html -->
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>BanglaHub — Please wait</title>
+<style>
+body{margin:0;font-family:Arial;background:#0b1220;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh}
+.box{width:100%;max-width:720px;padding:18px;background:#111;border-radius:12px;text-align:center}
+.count{font-size:48px;font-weight:800;margin:14px 0}
+.msg{color:#9aa4b8}
+.ads{margin:10px auto}
+</style>
+</head>
+<body>
+<div class="box">
+  <h2>আপনি এখন ভিডিও দেখতে যাচ্ছেন</h2>
+  <p class="msg">দয়া করে <span id="seconds">7</span> সেকেন্ড অপেক্ষা করুন…</p>
+
+  <!-- place a native ad -->
+  <div class="ads">
+    <script async src="//pl27967475.effectivegatecpm.com/e1682f5b5155c961011e82faea551290/invoke.js"></script>
+    <div id="container-e1682f5b5155c961011e82faea551290"></div>
+  </div>
+
+  <!-- small banner -->
+  <div class="ads">
+    <script type="text/javascript">
+      atOptions = {'key':'30921df49dc35be6701cc3d7f8ca8108','format':'iframe','height':50,'width':320,'params':{}};
+    </script>
+    <script src="//www.highperformanceformat.com/30921df49dc35be6701cc3d7f8ca8108/invoke.js"></script>
+  </div>
+
+  <p style="font-size:13px;color:#889">আপনি অপেক্ষা করার পরই ভিডিও আসবে</p>
+</div>
+
+<script>
+/*
+ Params:
+   id = video id (used by video.html to build preview OR if not drive id, video.html opens URL)
+   url = encoded direct video url (preferred)
+*/
+const params = new URLSearchParams(location.search);
+const id = params.get('id') || '';
+const url = params.get('url') || '';
+
+let t = 7;
+const sEl = document.getElementById('seconds');
+const iv = setInterval(()=>{
+  t--; sEl.textContent = t;
+  if(t<=0){
+    clearInterval(iv);
+    // after countdown redirect to video.html, pass url or id
+    if(url) location.href = 'video.html?src=' + encodeURIComponent(url);
+    else location.href = 'video.html?id=' + encodeURIComponent(id);
+  }
+},1000);
+</script>
+</body>
+</html>
