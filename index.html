@@ -1,0 +1,157 @@
+<!-- index.html -->
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>BanglaHub</title>
+<style>
+:root{--bg:#0d0d0d;--card:#111;--muted:#9aa4b8;--accent:#ff3366}
+body{margin:0;font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);color:#fff}
+.header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #121212}
+.brand{font-weight:700;font-size:18px}
+.top-right{display:flex;gap:10px;align-items:center}
+.tg-icon{width:28px;height:28px;border-radius:6px;background:#1da1f2;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;text-decoration:none;padding:2px}
+.news-box{background:#0b1220;padding:8px;border-radius:8px;color:#cfe;max-width:320px;font-size:13px}
+.container{max-width:1100px;margin:18px auto;padding:0 14px}
+.categories{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;justify-content:center}
+.cat-btn{background:#141414;border:1px solid #222;color:#fff;padding:8px 14px;border-radius:8px;font-weight:800;cursor:pointer}
+
+.video-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:14px;
+}
+
+/* CARD: maintain equal height for title area so thumbnails don't mis-align */
+.video-card{
+  background:var(--card);
+  border-radius:10px;
+  overflow:hidden;
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  min-height: 260px; /* ensure consistent sizing */
+}
+
+/* Thumbnail aspect 14:9 -> percentage trick: height = width * 9/14 ≈ 64.2857% */
+.thumb-wrap{position:relative;width:100%;padding-top:64.2857%;overflow:hidden;background:#000}
+.thumb-wrap img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+
+/* duration badge: top-right over thumb */
+.duration-badge{
+  position:absolute;right:10px;top:10px;background:rgba(0,0,0,0.7);padding:4px 8px;border-radius:6px;font-weight:700;font-size:13px;
+  color:#fff;z-index:5;
+}
+
+/* small meta row under thumb */
+.meta-row{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:transparent}
+.meta-left{font-size:13px;color:var(--muted)}
+.meta-title{flex:1;padding:0 8px;font-weight:700;font-size:14px;line-height:1.1;max-height:2.2em;overflow:hidden}
+.meta-right{font-size:13px;color:var(--muted);text-align:right}
+
+/* watch button at bottom center */
+.card-bottom{padding:10px;text-align:center}
+.watch-btn{display:inline-block;background:var(--accent);color:#fff;padding:8px 16px;border-radius:8px;font-weight:800;text-decoration:none}
+
+/* responsive */
+@media(max-width:800px){
+  .video-grid{grid-template-columns:1fr}
+  .container{padding:0 10px}
+  .news-box{max-width:200px}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="brand">BanglaHub</div>
+  <div class="top-right">
+    <a class="tg-icon" href="https://t.me/yourgroup" target="_blank" title="Telegram">TG</a>
+    <div class="news-box" id="newsBox">Latest: Welcome to BanglaHub</div>
+  </div>
+</header>
+
+<main class="container">
+  <div class="categories" id="cats">
+    <button class="cat-btn" onclick="filterCategory('All')">All</button>
+    <button class="cat-btn" onclick="filterCategory('Viral')">Viral</button>
+    <button class="cat-btn" onclick="filterCategory('Comedy')">Comedy</button>
+    <button class="cat-btn" onclick="filterCategory('Music')">Music</button>
+    <button class="cat-btn" onclick="filterCategory('News')">News</button>
+  </div>
+
+  <section id="grid" class="video-grid"></section>
+</main>
+
+<!-- native ad -->
+<div style="text-align:center;padding:12px;">
+  <script async src="//pl27967475.effectivegatecpm.com/e1682f5b5155c961011e82faea551290/invoke.js"></script>
+  <div id="container-e1682f5b5155c961011e82faea551290"></div>
+</div>
+
+<!-- bottom banner ad -->
+<div style="text-align:center;padding:8px;">
+<script type="text/javascript">
+	atOptions = {'key':'1535101a42bd09dee1fb390e6f781fe3','format':'iframe','height':250,'width':300,'params':{}};
+</script>
+<script src="//www.highperformanceformat.com/1535101a42bd09dee1fb390e6f781fe3/invoke.js"></script>
+</div>
+
+<script>
+/* load videos.json and render 2x2 flow (grid already handles rows of 2)
+   videos.json items must include:
+   { "id": "...", "title": "...", "thumb": "...", "video_url": "...", "views": "12.3K", "likes": "72%", "duration": "03:25", "cat": "Viral" }
+*/
+let all = [];
+
+async function loadVideos(){
+  try{
+    const res = await fetch('videos.json',{cache:'no-store'});
+    all = await res.json();
+  }catch(e){ all = []; console.error(e) }
+  render(all);
+}
+
+function render(list){
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  list.forEach(item=>{
+    // build card
+    const el = document.createElement('article');
+    el.className = 'video-card';
+    el.innerHTML = `
+      <div class="thumb-wrap">
+        <img src="${item.thumb||''}" alt="${(item.title||'')}" />
+        <div class="duration-badge">${item.duration||''}</div>
+      </div>
+      <div class="meta-row">
+        <div class="meta-left">${item.views||'0'}</div>
+        <div class="meta-title">${escapeHtml(item.title||'Untitled')}</div>
+        <div class="meta-right">${item.likes||''}</div>
+      </div>
+      <div class="card-bottom">
+        <a class="watch-btn" href="countdown.html?id=${encodeURIComponent(item.id)}&url=${encodeURIComponent(item.video_url)}" >Watch</a>
+      </div>
+    `;
+    grid.appendChild(el);
+  });
+}
+
+// simple category filter
+function filterCategory(cat){
+  if(cat==='All') return render(all);
+  render(all.filter(x=>x.cat===cat));
+}
+
+// helper
+function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+// make news box editable via console or you can implement a simple UI later
+window.updateNews = (txt)=>{ document.getElementById('newsBox').textContent = txt; };
+
+loadVideos();
+</script>
+</body>
+</html>
