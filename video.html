@@ -1,0 +1,37 @@
+<!-- video.html -->
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>BanglaHub — Player</title>
+<style>body{margin:0;background:#000} .wrap{max-width:900px;margin:12px auto;padding:10px}</style>
+</head>
+<body>
+<div class="wrap">
+  <div style="background:#111;padding:10px;border-radius:8px">
+    <iframe id="player" width="100%" height="480" allow="autoplay;fullscreen" style="border:0;border-radius:6px"></iframe>
+  </div>
+</div>
+
+<script>
+const p = new URLSearchParams(location.search);
+const src = p.get('src');
+const id = p.get('id');
+
+if (src) {
+  // if src is an iframe-friendly url (bunny or direct mp4), try to embed via HTML5 fallback or iframe
+  if (src.endsWith('.mp4') || src.indexOf('uc?export')>-1 || src.startsWith('https://')) {
+    // embed HTML5 video for direct mp4 or drive download url
+    document.getElementById('player').outerHTML = '<video controls autoplay style="width:100%;height:480px;max-height:80vh;background:#000"><source src="'+decodeURIComponent(src)+'" type="video/mp4">Your browser does not support the video tag.</video>';
+  } else {
+    document.getElementById('player').src = decodeURIComponent(src);
+  }
+} else if(id){
+  // assume Google Drive file ID (preview)
+  document.getElementById('player').src = 'https://drive.google.com/file/d/' + decodeURIComponent(id) + '/preview';
+} else {
+  document.getElementById('player').outerHTML = '<div style="color:#fff;padding:20px">Video not found</div>';
+}
+</script>
+</body>
+</html>
